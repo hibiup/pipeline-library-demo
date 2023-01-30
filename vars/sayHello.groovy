@@ -1,5 +1,9 @@
 #!/usr/bin/env groovy
 
+/*
+  这是 pipeline 脚本，可以直接 `import` /src下的代码：
+*/
+
 import com.cleverbuilder.GlobalVars
 import com.cleverbuilder.SampleClass
 

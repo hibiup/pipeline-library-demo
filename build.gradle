@@ -1,0 +1,44 @@
+plugins {
+    id 'groovy'
+    // shared-library plugin 会改变项目的目录结构，依据 jenkins pipelines library 的要求，vars 和 src 必须为源代码根目录。
+    id("com.mkobit.jenkins.pipelines.shared-library") version "0.10.1"
+    id("com.github.ben-manes.versions") version "0.21.0"
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.groovy:groovy:4.0.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+/*
+jenkinsIntegration {
+    baseUrl.set(uri("https://opsdev-app-jenkins.route53.lexis.com").toURL())
+    authentication.set(providers.provider { AnonymousAuthentication })
+    downloadDirectory.set(layout.projectDirectory.dir("resources"))
+}
+
+sharedLibrary {
+    // TODO: this will need to be altered when auto-mapping functionality is complete
+    coreVersion.set(jenkinsIntegration.downloadDirectory.file("core-version.txt").map { it.asFile.readText().trim() })
+    // TODO: retrieve downloaded plugin resource
+    pluginDependencies {
+        dependency("org.jenkins-ci.plugins", "pipeline-build-step", "2.13")
+        declarativePluginsVersion = "1.7.2"
+        dependency("org.jenkinsci.plugins", "pipeline-model-api", declarativePluginsVersion)
+        dependency("org.jenkinsci.plugins", "pipeline-model-definition", declarativePluginsVersion)
+        dependency("org.jenkinsci.plugins", "pipeline-model-extensions", declarativePluginsVersion)
+    }
+}
+*/
