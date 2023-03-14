@@ -7,9 +7,13 @@
 import com.cleverbuilder.GlobalVars
 import com.cleverbuilder.SampleClass
 
+/**
+ * 入口函数
+ */
 def call( String name = 'human') {
   echo "Hello, ${name}."
 
+  // 可以调用其它定义在 src 目录下的内部资源。
   def sampleClass = new SampleClass()
   sampleClass.setName(GlobalVars.foo)
   sampleClass.setAge(23)
