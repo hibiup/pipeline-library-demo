@@ -30,7 +30,8 @@ test {
  * 修改缺省的构建目录。Gradle 缺省构建目录是 `Build`，而单元测试的 JenkinsPipelineSpecification.loadPipelineScriptForTest(...)
  * 方法只兼容 maven 的输出目录: target，所以要将 Build 改为 target。
  */
-buildDir = "${rootDir.absolutePath}/target"
+//buildDir = "${rootDir.absolutePath}/target"
+buildDir = file("target")
 
 sourceSets {
     main {
