@@ -17,6 +17,7 @@ def call( String name = 'human') {
   def sampleClass = new SampleClass()
   sampleClass.setName(GlobalVars.foo)
   sampleClass.setAge(23)
+  sampleClass.increaseAge(10)
 
   echo "Happy Birthday! ${sampleClass.getAge()}"
 }

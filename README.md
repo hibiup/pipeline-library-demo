@@ -19,7 +19,7 @@ the following settings:
 
     ```
     // 加载共享库. `pipeline-library-demob` 是配置的库名，`@<branch_name>` 为可选项。
-    @Library('pipeline-library-demob@maaster')_
+    @Library('pipeline-library-demob@master')_
 
     stage('Demo') {
       echo 'Hello World'

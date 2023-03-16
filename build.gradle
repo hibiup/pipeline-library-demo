@@ -1,5 +1,7 @@
 plugins {
+    id 'java'
     id 'groovy'
+    id 'idea'
     // shared-library plugin 会改变项目的目录结构，依据 jenkins pipelines library 的要求，vars 和 src 必须为源代码根目录。
     id("com.mkobit.jenkins.pipelines.shared-library") version "0.10.1"
     id("com.github.ben-manes.versions") version "0.21.0"
@@ -8,22 +10,105 @@ plugins {
 group 'org.example'
 version '1.0-SNAPSHOT'
 
-repositories {
-    mavenCentral()
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
-dependencies {
-    implementation 'org.apache.groovy:groovy:4.0.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+tasks {
+    wrapper {
+        gradleVersion = "7.4.1"
+    }
 }
 
 test {
     useJUnitPlatform()
 }
 
-/*
-jenkinsIntegration {
+/**
+ * 解决单元测试的加载问题(1)：
+ *
+ * 修改缺省的构建目录。Gradle 缺省构建目录是 `Build`，而单元测试的 JenkinsPipelineSpecification.loadPipelineScriptForTest(...)
+ * 方法只兼容 maven 的输出目录: target，所以要将 Build 改为 target。
+ */
+buildDir = "${rootDir.absolutePath}/target"
+
+sourceSets {
+    main {
+        groovy {
+            srcDirs = ['src']
+        }
+        /**
+         * 解决单元测试的加载问题(2)：
+         *
+         * 将 vars 作为 resource 目录，否则 Jenkins pipeline 脚本将不会被拷贝到 output 目录，导致单元测无法找到并加载它。
+         */
+        resources {
+            srcDirs = ['vars', 'resources']
+        }
+
+        /**
+         * 解决单元测试的加载问题(3)：
+         *
+         * 同样要修改缺省的 resource 输出目录到 `target/classes`，否则 JenkinsPipelineSpecification.loadPipelineScriptForTest(...)
+         * 无法找到 sayHello.groovy 脚本
+         */
+        output.resourcesDir = file('target/classes')
+    }
+
+    test {
+        groovy.srcDir("test/unit")
+        resources {
+            srcDirs = ['test/resources']
+        }
+    }
+
+    integrationTest{
+        groovy{
+            srcDirs = ['test/integration']
+        }
+        resources {
+            srcDirs = ['test/resources']
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Groovy version
+    implementation 'org.codehaus.groovy:groovy:2.4.12'
+
+    // Spock
+    def spock = "org.spockframework:spock-core:1.1-groovy-2.4"
+    testImplementation(spock)
+    integrationTestImplementation(spock)
+
+    // JUnit
+    def junitJupiter = "org.junit.jupiter:junit-jupiter-api:5.8.1"
+    def junitJupiterEngine = "org.junit.jupiter:junit-jupiter-engine:5.8.1"
+    testImplementation junitJupiter
+    testRuntimeOnly junitJupiterEngine
+    //def junitVersion = "4.12"
+    //testImplementation("junit:junit:$junitVersion")
+
+    // Jenkins
+    def jenkinsSpock= "com.homeaway.devtools.jenkins:jenkins-spock:2.1.5"
+    def jenkinsCore = "org.jenkins-ci.main:jenkins-core:2.102"
+    def jenkinsJunit = "org.jenkins-ci.plugins:junit:1.24"
+    testImplementation(jenkinsSpock)
+    testImplementation(jenkinsCore)
+    testImplementation(jenkinsJunit)
+    integrationTestImplementation(jenkinsSpock)
+    integrationTestImplementation(jenkinsCore)
+    integrationTestImplementation(jenkinsJunit)
+
+    def icu4j = "com.ibm.icu:icu4j:3.4.4"
+    testImplementation(icu4j)
+}
+
+/*jenkinsIntegration {
     baseUrl.set(uri("https://opsdev-app-jenkins.route53.lexis.com").toURL())
     authentication.set(providers.provider { AnonymousAuthentication })
     downloadDirectory.set(layout.projectDirectory.dir("resources"))
@@ -35,10 +120,9 @@ sharedLibrary {
     // TODO: retrieve downloaded plugin resource
     pluginDependencies {
         dependency("org.jenkins-ci.plugins", "pipeline-build-step", "2.13")
-        declarativePluginsVersion = "1.7.2"
+        def declarativePluginsVersion = "1.7.2"
         dependency("org.jenkinsci.plugins", "pipeline-model-api", declarativePluginsVersion)
         dependency("org.jenkinsci.plugins", "pipeline-model-definition", declarativePluginsVersion)
         dependency("org.jenkinsci.plugins", "pipeline-model-extensions", declarativePluginsVersion)
     }
-}
-*/
+}*/
